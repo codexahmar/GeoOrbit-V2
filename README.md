@@ -1,124 +1,77 @@
-# 🌍 GeoOrbit
+# Solaris
 
+A high-fidelity, interactive 3D solar system and planetary encyclopedia built with Flutter. Designed with platform-native architectures for iOS (**Apple Cupertino**) and Android (**Material 3**).
 
+---
 
-GeoOrbit is a stunning interactive 3D globe application that lets you explore Earth and other celestial bodies with beautiful visualizations. Navigate through space, add custom location markers, create connections between points, and switch between different planet textures - all with smooth animations and an immersive cyberpunk-inspired UI.
+## Highlights
 
-## ✨ Features
+- **3D Planetary Engine**: Interactive 360° celestial sphere with high-resolution textures across the Solar System (*Sun, Mercury, Venus, Earth, Moon, Mars, Jupiter, Saturn, Uranus, Neptune*).
+- **True Platform-Native UI**:
+  - **iOS**: Apple Cupertino design language featuring Inset Grouped lists, frosted navigation bars, SF Symbols, and modal action sheets.
+  - **Android**: Modern Material 3 interface with dynamic surfaces, adaptive elevation, and bottom sheets.
+- **Waypoints & Flight Paths**: Real-time ground coordinates, interactive focus transitions, and animated sub-orbital trajectory arcs.
+- **Adaptive Layout**: Multi-pane workstation view on tablets/desktops and an optimized viewport on mobile devices.
+- **Hardware-Accelerated**: 60 FPS rendering with reactive state management.
 
-- 🌐 **Interactive 3D Globe** - Smooth rotation and zoom controls
-- 📍 **Location Markers** - Add and customize points of interest
-- 🔗 **Connections** - Draw animated paths between locations
-- 🎨 **Multiple Textures** - Switch between Earth, Mars, Jupiter, and more
-- 📱 **Responsive Design** - Works seamlessly on mobile, tablet, and desktop
-- 🎭 **Modern UI** - Cyberpunk-inspired design with gradients and glow effects
-- ⚡ **Performance Optimized** - Smooth 60fps animations
-- 🌙 **Dark Theme** - Eye-friendly dark mode interface
+---
 
-## 🚀 Installation
+## Tech Stack
+
+- **Framework**: [Flutter](https://flutter.dev/) (Dart 3)
+- **3D Sphere Engine**: [`flutter_earth_globe`](https://pub.dev/packages/flutter_earth_globe)
+- **State Management**: [`provider`](https://pub.dev/packages/provider)
+- **Design Systems**: Apple Cupertino / Google Material 3
+
+---
+
+## Quick Start
 
 ### Prerequisites
+- Flutter SDK `^3.0.0`
+- Dart SDK `^3.0.0`
 
-- Flutter SDK (3.0 or higher)
-- Dart SDK (3.0 or higher)
-- Android Studio / VS Code with Flutter extensions
+### Run Locally
 
-### Steps
+```bash
+# Clone the repository
+git clone https://github.com/codexahmar/SolarSystem-3D.git
+cd SolarSystem-3D
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/codexahmar/GeoOrbit-V2/
-   cd orbit360
-   ```
+# Install dependencies
+flutter pub get
 
-2. **Install dependencies**
-   ```bash
-   flutter pub get
-   ```
-
-3. **Run the app**
-   ```bash
-   flutter run
-   ```
-
-## 📱 Usage
-
-### Basic Controls
-
-- **Rotate Globe**: Drag with mouse/finger
-- **Zoom**: Pinch gesture or mouse wheel
-- **Add Points**: Use the left control panel
-- **Change Texture**: Use the right panel to select different planets
-- **Create Connections**: Enable connections from the control panel
-
-### Features Overview
-
-#### Control Panel (Left)
-- Toggle automatic rotation
-- Adjust rotation speed
-- Control zoom level
-- Manage location points
-- Enable/disable connections
-
-#### Texture Panel (Right)
-- Browse available textures
-- Switch between planets
-- Real-time texture preview
-
-#### Coordinate Display (Bottom)
-- Shows clicked location coordinates
-- Displays latitude and longitude
-- Real-time updates
-
-## 🏗️ Project Structure
-
+# Run the app
+flutter run
 ```
+
+---
+
+## Project Structure
+
+```text
 lib/
-├── main.dart
 ├── core/
-│   ├── constants/       # App-wide constants
-│   ├── theme/          # Theme configuration
-│   └── utils/          # Utility functions
+│   ├── constants/       # Breakpoints & design constants
+│   └── theme/           # Cupertino & Material 3 theme configurations
 ├── data/
-│   └── models/         # Data models
+│   ├── models/          # Celestial body & location data models
+│   └── repositories/    # Geo coordinates & flight connection data
 ├── presentation/
-│   ├── screens/        # App screens
-│   └── widgets/        # Reusable widgets
-└── services/           # Business logic
+│   ├── providers/       # GlobeProvider state management
+│   ├── screens/         # HomeScreen (responsive adaptive layout)
+│   └── widgets/         # 3D globe viewport, control panel & texture selector
+└── utils/               # Platform detection & animation helpers
 ```
 
-## 🛠️ Built With
+---
 
-- [Flutter](https://flutter.dev/) - UI framework
-- [flutter_earth_globe](https://pub.dev/packages/flutter_earth_globe) - 3D globe rendering
-- [Material Design 3](https://m3.material.io/) - Design system
+## Author
 
+**Ahmaryar Khan** — [@codexahmar](https://github.com/codexahmar)
 
-## 🤝 Contributing
+---
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## License
 
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👤 Author
-
-**Ahmaryar Khan**
-
-- GitHub: [@codexahmar](https://github.com/codexahmar)
-
-
-<div align="center">
-
-Made with ❤️ and Flutter
-
-⭐ Star this repo if you find it helpful!
-
-</div>
+This project is licensed under the [MIT License](LICENSE).
