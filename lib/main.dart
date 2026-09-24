@@ -27,6 +27,11 @@ class SolarisApp extends StatelessWidget {
               title: 'Solaris 3D',
               debugShowCheckedModeBanner: false,
               theme: AppTheme.cupertinoDarkTheme,
+              localizationsDelegates: const [
+                DefaultMaterialLocalizations.delegate,
+                DefaultCupertinoLocalizations.delegate,
+                DefaultWidgetsLocalizations.delegate,
+              ],
               home: const HomeScreen(),
             );
           }

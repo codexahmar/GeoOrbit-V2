@@ -27,11 +27,11 @@ class _AmbientSpaceBackgroundState extends State<AmbientSpaceBackground>
     )..repeat(reverse: true);
 
     final random = math.Random(42);
-    for (int i = 0; i < 60; i++) {
+    for (int i = 0; i < 55; i++) {
       _stars.add(_StarParticle(
         x: random.nextDouble(),
         y: random.nextDouble(),
-        size: random.nextDouble() * 2.2 + 0.8,
+        size: random.nextDouble() * 2.0 + 0.8,
         alpha: random.nextDouble() * 0.7 + 0.3,
         twinkleSpeed: random.nextDouble() * 0.8 + 0.4,
       ));
@@ -54,22 +54,18 @@ class _AmbientSpaceBackgroundState extends State<AmbientSpaceBackground>
         return Stack(
           fit: StackFit.expand,
           children: [
-            // Deep OLED void background
+            // Pure OLED Space Canvas (Deep cinematic black for perfect recording contrast)
             const DecoratedBox(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: AppColors.cosmicDeepGradient,
-                ),
+                color: AppColors.voidBlack,
               ),
             ),
 
-            // Dynamic Volumetric Planetary Nebula Aura (Subtle backlighting)
+            // Volumetric Planetary Atmosphere Nebula (Radiates against pure black)
             AnimatedBuilder(
               animation: _shimmerController,
               builder: (context, _) {
-                final pulse = 0.85 + (0.15 * _shimmerController.value);
+                final pulse = 0.88 + (0.12 * _shimmerController.value);
 
                 return Stack(
                   children: [
@@ -78,18 +74,18 @@ class _AmbientSpaceBackgroundState extends State<AmbientSpaceBackground>
                         decoration: BoxDecoration(
                           gradient: RadialGradient(
                             center: const Alignment(0.0, -0.05),
-                            radius: 0.85 * pulse,
+                            radius: 0.80 * pulse,
                             colors: [
-                              auraColor.withOpacity(0.14),
+                              auraColor.withOpacity(0.18),
                               auraColor.withOpacity(0.04),
                               Colors.transparent,
                             ],
-                            stops: const [0.0, 0.5, 1.0],
+                            stops: const [0.0, 0.48, 1.0],
                           ),
                         ),
                       ),
                     ),
-                    // Ambient Twinkling Stars Layer
+                    // Ambient Twinkling Stars
                     CustomPaint(
                       painter: _StarFieldPainter(
                         stars: _stars,
@@ -102,7 +98,7 @@ class _AmbientSpaceBackgroundState extends State<AmbientSpaceBackground>
               },
             ),
 
-            // Child Content (Globe & HUD)
+            // Foreground Content (Globe & HUD)
             widget.child,
           ],
         );
@@ -141,7 +137,7 @@ class _StarFieldPainter extends CustomPainter {
       final twinkle = (math.sin(animationValue * math.pi * 2 * star.twinkleSpeed) + 1) / 2;
       final currentAlpha = (star.alpha * (0.4 + 0.6 * twinkle)).clamp(0.0, 1.0);
 
-      paint.color = Colors.white.withOpacity(currentAlpha * 0.8);
+      paint.color = Colors.white.withOpacity(currentAlpha * 0.85);
       canvas.drawCircle(
         Offset(star.x * size.width, star.y * size.height),
         star.size,

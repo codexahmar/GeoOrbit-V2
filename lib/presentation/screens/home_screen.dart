@@ -10,7 +10,6 @@ import '../widgets/ambient_space_background.dart';
 import '../widgets/animated_globe_container.dart';
 import '../widgets/telemetry_hud.dart';
 import '../widgets/celestial_carousel.dart';
-import '../widgets/camera_control_dock.dart';
 import '../widgets/planet_detail_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,70 +28,114 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // -------------------------------------------------------------------------
+  // Ultra-Smooth Native Apple Cupertino Modal Sheet (Instant, Zero Lag)
+  // -------------------------------------------------------------------------
   void _showCupertinoSheet({required Widget child, required String title}) {
     HapticFeedback.mediumImpact();
     showCupertinoModalPopup(
       context: context,
-      builder: (ctx) => CupertinoPopupSurface(
-        isSurfacePainted: false,
+      builder: (ctx) => SafeArea(
+        top: false,
         child: Container(
-          height: MediaQuery.of(context).size.height * 0.84,
+          height: MediaQuery.of(context).size.height * 0.86,
           decoration: const BoxDecoration(
-            color: Color(0xFF10172D),
+            color: Color(0xFF141519), // Apple Modern Dark Graphite
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            border: Border(
+              top: BorderSide(color: Color(0x2EFFFFFF), width: 0.8),
+            ),
           ),
-          child: CupertinoPageScaffold(
-            backgroundColor: const Color(0xFF10172D),
-            navigationBar: CupertinoNavigationBar(
-              backgroundColor: const Color(0xE60D1326),
-              border: const Border(bottom: BorderSide(color: Color(0x33FFFFFF), width: 0.5)),
-              middle: Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17,
-                  color: CupertinoColors.white,
+          child: Column(
+            children: [
+              // Apple Native Capsule Grab Handle
+              const SizedBox(height: 8),
+              Container(
+                width: 38,
+                height: 4.5,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF52525B),
+                  borderRadius: BorderRadius.circular(3),
                 ),
               ),
-              trailing: CupertinoButton(
-                padding: EdgeInsets.zero,
-                child: const Text(
-                  'Done',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: CupertinoColors.activeBlue,
-                  ),
+
+              // Header Row (Title + Apple "Done" Button)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 16, 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontFamily: '.SF Pro Display',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 17.5,
+                        color: CupertinoColors.white,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    CupertinoButton(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      minSize: 0,
+                      child: const Text(
+                        'Done',
+                        style: TextStyle(
+                          fontFamily: '.SF Pro Text',
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                          color: CupertinoColors.activeBlue,
+                        ),
+                      ),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
                 ),
-                onPressed: () => Navigator.of(ctx).pop(),
               ),
-            ),
-            child: SafeArea(
-              top: false,
-              child: child,
-            ),
+              Container(height: 0.5, color: const Color(0x1FFFFFFF)),
+
+              // Sheet Body (Starts immediately so Planet thumbnail is 100% visible)
+              Expanded(
+                child: child,
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
+  // -------------------------------------------------------------------------
+  // Ultra-Smooth Android Material 3 BottomSheet
+  // -------------------------------------------------------------------------
   void _showMaterialBottomSheet({required Widget child, required String title}) {
     HapticFeedback.lightImpact();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      showDragHandle: true,
-      backgroundColor: const Color(0xFF10172D),
+      useSafeArea: true,
+      backgroundColor: const Color(0xFF141519),
+      barrierColor: Colors.black.withOpacity(0.70),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         side: BorderSide(color: AppColors.glassBorder, width: 1),
       ),
       builder: (ctx) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.82,
+        height: MediaQuery.of(context).size.height * 0.85,
         child: Column(
           children: [
+            // M3 Drag Handle
+            const SizedBox(height: 10),
+            Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.textTertiary,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+              padding: const EdgeInsets.fromLTRB(20, 10, 12, 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -110,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            const Divider(color: Color(0x26FFFFFF)),
+            const Divider(color: Color(0x1FFFFFFF), height: 1),
             Expanded(child: child),
           ],
         ),
@@ -169,22 +212,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Bottom Area: Planet Strip + Quick Controls
+            // Bottom Floating Celestial Carousel
             if (isMobile)
-              Positioned(
+              const Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CelestialCarousel(),
-                    const SizedBox(height: 4),
-                    CameraControlDock(
-                      onOpenPlanetDetails: () => _openPlanetDetails(true),
-                    ),
-                  ],
-                ),
+                child: CelestialCarousel(),
               )
             else
               // Desktop / Tablet Layout
@@ -197,9 +231,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 380,
                       margin: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xF010172D),
+                        color: const Color(0xF0141519),
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: const Color(0x33FFFFFF)),
+                        border: Border.all(color: const Color(0x2EFFFFFF)),
                       ),
                       child: const ClipRRect(
                         borderRadius: BorderRadius.all(Radius.circular(24)),
@@ -208,21 +242,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
 
                     // Center & Bottom Carousel
-                    Expanded(
+                    const Expanded(
                       child: Align(
                         alignment: Alignment.bottomCenter,
                         child: Padding(
-                          padding: const EdgeInsets.only(bottom: 24),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const CelestialCarousel(),
-                              const SizedBox(height: 10),
-                              CameraControlDock(
-                                onOpenPlanetDetails: () => _openPlanetDetails(true),
-                              ),
-                            ],
-                          ),
+                          padding: EdgeInsets.only(bottom: 24),
+                          child: CelestialCarousel(),
                         ),
                       ),
                     ),
@@ -259,22 +284,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Bottom Area: Planet Strip + Quick Controls
+            // Bottom Floating Celestial Carousel
             if (isMobile)
-              Positioned(
+              const Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CelestialCarousel(),
-                    const SizedBox(height: 4),
-                    CameraControlDock(
-                      onOpenPlanetDetails: () => _openPlanetDetails(false),
-                    ),
-                  ],
-                ),
+                child: CelestialCarousel(),
               )
             else
               // Desktop / Tablet Layout
@@ -287,7 +303,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 380,
                       margin: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xF010172D),
+                        color: const Color(0xF0141519),
                         borderRadius: BorderRadius.circular(28),
                         border: Border.all(color: AppColors.glassBorder),
                       ),
@@ -298,21 +314,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
 
                     // Center & Bottom Carousel
-                    Expanded(
+                    const Expanded(
                       child: Align(
                         alignment: Alignment.bottomCenter,
                         child: Padding(
-                          padding: const EdgeInsets.only(bottom: 24),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const CelestialCarousel(),
-                              const SizedBox(height: 10),
-                              CameraControlDock(
-                                onOpenPlanetDetails: () => _openPlanetDetails(false),
-                              ),
-                            ],
-                          ),
+                          padding: EdgeInsets.only(bottom: 24),
+                          child: CelestialCarousel(),
                         ),
                       ),
                     ),

@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/celestial_body_model.dart';
 import '../providers/globe_provider.dart';
@@ -22,7 +20,7 @@ class PlanetDetailSheet extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// iOS Cupertino Native Planet Detail View (Apple HIG Clean Sheet)
+// iOS Cupertino Native Planet Detail View (Apple HIG Clean Graphite Insets)
 // ---------------------------------------------------------------------------
 class _CupertinoPlanetDetailView extends StatelessWidget {
   const _CupertinoPlanetDetailView();
@@ -36,21 +34,21 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
         return CupertinoScrollbar(
           child: ListView(
             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(18, 12, 18, 36),
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 40),
             children: [
-              // 1. Planet Header Card
+              // 1. Planet Header Card (Fully visible at the very top)
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1B233D),
-                  borderRadius: BorderRadius.circular(22),
+                  color: AppColors.cardElevated,
+                  borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: body.themeColor.withOpacity(0.6),
-                    width: 1.5,
+                    color: body.themeColor.withOpacity(0.55),
+                    width: 1.2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: body.themeColor.withOpacity(0.2),
+                      color: body.themeColor.withOpacity(0.18),
                       blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
@@ -59,8 +57,8 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                 child: Row(
                   children: [
                     Container(
-                      width: 62,
-                      height: 62,
+                      width: 64,
+                      height: 64,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [
@@ -115,15 +113,15 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF151C32),
+                  color: AppColors.cardDark,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0x33FFFFFF)),
+                  border: Border.all(color: const Color(0x1FFFFFFF)),
                 ),
                 child: Text(
                   body.description,
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Color(0xFFE2E8F0),
+                    color: Color(0xFFE4E4E7),
                     height: 1.5,
                     fontWeight: FontWeight.w400,
                   ),
@@ -146,9 +144,9 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF151C32),
+                    color: AppColors.cardDark,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0x33FFFFFF)),
+                    border: Border.all(color: const Color(0x1FFFFFFF)),
                   ),
                   child: Column(
                     children: body.atmosphere.entries.map((entry) {
@@ -180,13 +178,24 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 6),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: percent,
-                                minHeight: 6,
-                                backgroundColor: const Color(0x22FFFFFF),
-                                color: body.themeColor,
+                            // Native Cupertino Smooth Progress Bar (Zero Material dependencies)
+                            Container(
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: const Color(0x1FFFFFFF),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: FractionallySizedBox(
+                                  widthFactor: percent,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: body.themeColor,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -204,7 +213,7 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1F2538),
+                  color: const Color(0xFF1E1B14),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: const Color(0xFFFFB703).withOpacity(0.6),
@@ -225,81 +234,11 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                         body.funFact,
                         style: const TextStyle(
                           fontSize: 13.5,
-                          color: Color(0xFFF8FAFC),
+                          color: Color(0xFFF4F4F5),
                           height: 1.45,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // 6. Camera & Rotation Controls
-              _buildSectionTitle('GLOBE CONTROLS'),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF151C32),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0x33FFFFFF)),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Auto-Rotate Sphere',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: CupertinoColors.white,
-                          ),
-                        ),
-                        CupertinoSwitch(
-                          value: provider.isRotating,
-                          activeColor: body.themeColor,
-                          onChanged: (_) {
-                            HapticFeedback.selectionClick();
-                            provider.toggleRotation();
-                          },
-                        ),
-                      ],
-                    ),
-                    const Divider(color: Color(0x22FFFFFF), height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Rotation Speed',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF94A3B8),
-                          ),
-                        ),
-                        Text(
-                          '${(provider.rotationSpeed * 100).toStringAsFixed(0)}%',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: CupertinoColors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    CupertinoSlider(
-                      value: provider.rotationSpeed,
-                      min: AppConstants.minRotationSpeed,
-                      max: AppConstants.maxRotationSpeed,
-                      activeColor: body.themeColor,
-                      onChanged: provider.isRotating
-                          ? (val) => provider.setRotationSpeed(val)
-                          : null,
                     ),
                   ],
                 ),
@@ -315,9 +254,9 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
     return Text(
       title,
       style: const TextStyle(
-        fontSize: 12,
+        fontSize: 11.5,
         fontWeight: FontWeight.w700,
-        color: Color(0xFF94A3B8),
+        color: AppColors.textSecondary,
         letterSpacing: 0.8,
       ),
     );
@@ -365,9 +304,9 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF151C32),
+        color: AppColors.cardDark,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x26FFFFFF)),
+        border: Border.all(color: const Color(0x1AFFFFFF)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -381,7 +320,7 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                   title,
                   style: const TextStyle(
                     fontSize: 11.5,
-                    color: Color(0xFF94A3B8),
+                    color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -424,21 +363,21 @@ class _MaterialPlanetDetailView extends StatelessWidget {
         final body = provider.selectedBody;
 
         return ListView(
-          padding: const EdgeInsets.fromLTRB(18, 10, 18, 36),
+          padding: const EdgeInsets.fromLTRB(18, 14, 18, 40),
           children: [
-            // 1. Planet Header
+            // 1. Planet Header Card (Fully visible at the very top)
             Card.filled(
-              color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.55),
+              color: AppColors.cardElevated,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(22),
-                side: BorderSide(color: body.themeColor.withOpacity(0.5), width: 1.2),
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: body.themeColor.withOpacity(0.55), width: 1.2),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     CircleAvatar(
-                      radius: 30,
+                      radius: 32,
                       backgroundImage: AssetImage(body.texturePath),
                     ),
                     const SizedBox(width: 16),
@@ -487,7 +426,7 @@ class _MaterialPlanetDetailView extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Text(
                   body.description,
-                  style: const TextStyle(fontSize: 14, color: Color(0xFFE2E8F0), height: 1.5),
+                  style: const TextStyle(fontSize: 14, color: Color(0xFFE4E4E7), height: 1.5),
                 ),
               ),
             ),
@@ -565,7 +504,7 @@ class _MaterialPlanetDetailView extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Card.filled(
-              color: const Color(0xFF22293E),
+              color: const Color(0xFF1E1B14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
                 side: const BorderSide(color: Color(0xFFFFB703), width: 1),
@@ -582,55 +521,6 @@ class _MaterialPlanetDetailView extends StatelessWidget {
                         body.funFact,
                         style: const TextStyle(fontSize: 13.5, color: Colors.white, height: 1.45),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 14),
-
-            // 6. Globe Controls
-            Text(
-              'GLOBE CONTROLS',
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.8,
-                  ),
-            ),
-            const SizedBox(height: 6),
-            Card.outlined(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Auto-Rotate Sphere', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                      value: provider.isRotating,
-                      activeColor: body.themeColor,
-                      onChanged: (_) {
-                        HapticFeedback.lightImpact();
-                        provider.toggleRotation();
-                      },
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Rotation Speed', style: TextStyle(color: AppColors.textSecondary)),
-                        Text('${(provider.rotationSpeed * 100).toStringAsFixed(0)}%', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                      ],
-                    ),
-                    Slider(
-                      value: provider.rotationSpeed,
-                      min: AppConstants.minRotationSpeed,
-                      max: AppConstants.maxRotationSpeed,
-                      activeColor: body.themeColor,
-                      onChanged: provider.isRotating
-                          ? (val) => provider.setRotationSpeed(val)
-                          : null,
                     ),
                   ],
                 ),
@@ -694,7 +584,7 @@ class _MaterialPlanetDetailView extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(fontSize: 11.5, color: Color(0xFF94A3B8)),
+                    style: const TextStyle(fontSize: 11.5, color: AppColors.textSecondary),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

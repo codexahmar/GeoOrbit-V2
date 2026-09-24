@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../core/theme/app_colors.dart';
 import '../providers/globe_provider.dart';
 import '../../utils/helpers.dart';
 
@@ -22,7 +23,7 @@ class TelemetryHud extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// iOS Cupertino Telemetry Top Bar (Apple Vision / HIG Glass Pill)
+// iOS Cupertino Telemetry Top Bar (Apple Vision / HIG Frosted Graphite Pill)
 // ---------------------------------------------------------------------------
 class _CupertinoTelemetryHudView extends StatelessWidget {
   final VoidCallback onOpenInfo;
@@ -38,23 +39,23 @@ class _CupertinoTelemetryHudView extends StatelessWidget {
         return SafeArea(
           bottom: false,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(24),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    color: const Color(0xCC0B1020),
+                    color: const Color(0xCC141519), // Apple Graphite Frosted Glass
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: const Color(0x2EFFFFFF),
-                      width: 1,
+                      color: const Color(0x28FFFFFF),
+                      width: 0.8,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: body.themeColor.withOpacity(0.12),
+                        color: Colors.black.withOpacity(0.4),
                         blurRadius: 16,
                         offset: const Offset(0, 4),
                       ),
@@ -64,8 +65,8 @@ class _CupertinoTelemetryHudView extends StatelessWidget {
                     children: [
                       // Glowing Status Orb
                       Container(
-                        width: 10,
-                        height: 10,
+                        width: 9,
+                        height: 9,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: body.themeColor,
@@ -113,7 +114,7 @@ class _CupertinoTelemetryHudView extends StatelessWidget {
                                 '${body.type} • ${body.diameter}',
                                 style: const TextStyle(
                                   fontSize: 11.5,
-                                  color: Color(0xFF94A3B8),
+                                  color: AppColors.textSecondary,
                                   fontWeight: FontWeight.w500,
                                 ),
                                 maxLines: 1,
@@ -124,25 +125,25 @@ class _CupertinoTelemetryHudView extends StatelessWidget {
                         ),
                       ),
 
-                      // Cupertino Facts Pill Button
+                      // Cupertino Facts Pill Button (Clean minimal design without sparkles)
                       CupertinoButton(
-                        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
-                        color: const Color(0x2EFFFFFF),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                        color: const Color(0x28FFFFFF),
                         borderRadius: BorderRadius.circular(16),
                         onPressed: () {
                           HapticFeedback.selectionClick();
                           onOpenInfo();
                         },
-                        child: Row(
+                        child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              CupertinoIcons.sparkles,
-                              size: 15,
-                              color: body.themeColor,
+                              CupertinoIcons.info_circle_fill,
+                              size: 14,
+                              color: CupertinoColors.white,
                             ),
-                            const SizedBox(width: 5),
-                            const Text(
+                            SizedBox(width: 5),
+                            Text(
                               'Facts',
                               style: TextStyle(
                                 fontSize: 13,
@@ -166,7 +167,7 @@ class _CupertinoTelemetryHudView extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Android Material 3 Telemetry Top Bar (M3 Expressive Pill)
+// Android Material 3 Telemetry Top Bar (M3 Expressive Graphite Pill)
 // ---------------------------------------------------------------------------
 class _MaterialTelemetryHudView extends StatelessWidget {
   final VoidCallback onOpenInfo;
@@ -182,7 +183,7 @@ class _MaterialTelemetryHudView extends StatelessWidget {
         return SafeArea(
           bottom: false,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Material(
               color: Colors.transparent,
               elevation: 4,
@@ -191,19 +192,19 @@ class _MaterialTelemetryHudView extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xF00E1428),
+                  color: AppColors.cardDark,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: const Color(0x33FFFFFF),
-                    width: 1,
+                    color: const Color(0x28FFFFFF),
+                    width: 0.8,
                   ),
                 ),
                 child: Row(
                   children: [
                     // Planet Color Accent Dot
                     Container(
-                      width: 10,
-                      height: 10,
+                      width: 9,
+                      height: 9,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: body.themeColor,
@@ -237,7 +238,7 @@ class _MaterialTelemetryHudView extends StatelessWidget {
                               '${body.type} • ${body.diameter}',
                               style: const TextStyle(
                                 fontSize: 11.5,
-                                color: Color(0xFF94A3B8),
+                                color: AppColors.textSecondary,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -247,14 +248,15 @@ class _MaterialTelemetryHudView extends StatelessWidget {
                       ),
                     ),
 
-                    // Material 3 Facts Button
+                    // Material 3 Facts Button (Clean minimal design without sparkles)
                     FilledButton.tonalIcon(
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        backgroundColor: AppColors.cardElevated,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
-                      icon: Icon(Icons.insights_rounded, size: 16, color: body.themeColor),
-                      label: const Text('Facts', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                      icon: const Icon(Icons.info_outline_rounded, size: 16, color: Colors.white),
+                      label: const Text('Facts', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white)),
                       onPressed: () {
                         HapticFeedback.lightImpact();
                         onOpenInfo();

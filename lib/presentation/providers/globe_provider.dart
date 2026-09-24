@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_earth_globe/flutter_earth_globe_controller.dart';
-import 'package:flutter_earth_globe/globe_coordinates.dart';
 import 'package:flutter_earth_globe/sphere_style.dart';
 import '../../data/models/celestial_body_model.dart';
 import '../../core/constants/app_constants.dart';
@@ -20,9 +19,6 @@ class GlobeProvider extends ChangeNotifier {
   CelestialBodyModel get selectedBody => _selectedBody;
   List<CelestialBodyModel> get allBodies => CelestialBodyModel.allBodies;
   bool get isInitialized => _isInitialized;
-  bool get isRotating => _isInitialized ? _controller.isRotating : true;
-  double get rotationSpeed => _isInitialized ? _controller.rotationSpeed : AppConstants.defaultRotationSpeed;
-  double get zoom => _isInitialized ? _controller.zoom : AppConstants.defaultZoom;
 
   // ---------------- Initialization ----------------
 
@@ -69,47 +65,6 @@ class GlobeProvider extends ChangeNotifier {
     } else {
       _controller.setSphereStyle(const SphereStyle());
     }
-  }
-
-  // ---------------- Rotation & Zoom Controls ----------------
-
-  void toggleRotation() {
-    if (_controller.isRotating) {
-      _controller.stopRotation();
-    } else {
-      _controller.startRotation();
-    }
-    notifyListeners();
-  }
-
-  void resetRotation() {
-    _controller.resetRotation();
-    _controller.focusOnCoordinates(const GlobeCoordinates(0, 0), animate: true);
-    notifyListeners();
-  }
-
-  void setRotationSpeed(double speed) {
-    _controller.rotationSpeed = speed.clamp(
-      AppConstants.minRotationSpeed,
-      AppConstants.maxRotationSpeed,
-    );
-    notifyListeners();
-  }
-
-  void setZoom(double zoom) {
-    _controller.setZoom(zoom.clamp(
-      AppConstants.minZoom,
-      AppConstants.maxZoom,
-    ));
-    notifyListeners();
-  }
-
-  void zoomIn() {
-    setZoom(_controller.zoom + 0.15);
-  }
-
-  void zoomOut() {
-    setZoom(_controller.zoom - 0.15);
   }
 
   @override
