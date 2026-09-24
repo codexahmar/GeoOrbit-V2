@@ -43,17 +43,24 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1B233D),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(22),
                   border: Border.all(
                     color: body.themeColor.withOpacity(0.6),
                     width: 1.5,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: body.themeColor.withOpacity(0.2),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 60,
-                      height: 60,
+                      width: 62,
+                      height: 62,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [
@@ -88,7 +95,7 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                           Text(
                             body.type,
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 13.5,
                               fontWeight: FontWeight.w600,
                               color: body.themeColor,
                             ),
@@ -100,7 +107,7 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
 
               // 2. Study Description / Educational Overview
               _buildSectionTitle('ABOUT ${body.name.toUpperCase()}'),
@@ -117,7 +124,7 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     color: Color(0xFFE2E8F0),
-                    height: 1.45,
+                    height: 1.5,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -219,7 +226,7 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 13.5,
                           color: Color(0xFFF8FAFC),
-                          height: 1.4,
+                          height: 1.45,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -255,6 +262,7 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                         ),
                         CupertinoSwitch(
                           value: provider.isRotating,
+                          activeColor: body.themeColor,
                           onChanged: (_) {
                             HapticFeedback.selectionClick();
                             provider.toggleRotation();
@@ -288,6 +296,7 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                       value: provider.rotationSpeed,
                       min: AppConstants.minRotationSpeed,
                       max: AppConstants.maxRotationSpeed,
+                      activeColor: body.themeColor,
                       onChanged: provider.isRotating
                           ? (val) => provider.setRotationSpeed(val)
                           : null,
@@ -419,9 +428,9 @@ class _MaterialPlanetDetailView extends StatelessWidget {
           children: [
             // 1. Planet Header
             Card.filled(
-              color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.55),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(22),
                 side: BorderSide(color: body.themeColor.withOpacity(0.5), width: 1.2),
               ),
               child: Padding(
@@ -429,7 +438,7 @@ class _MaterialPlanetDetailView extends StatelessWidget {
                 child: Row(
                   children: [
                     CircleAvatar(
-                      radius: 28,
+                      radius: 30,
                       backgroundImage: AssetImage(body.texturePath),
                     ),
                     const SizedBox(width: 16),
@@ -478,7 +487,7 @@ class _MaterialPlanetDetailView extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Text(
                   body.description,
-                  style: const TextStyle(fontSize: 14, color: Color(0xFFE2E8F0), height: 1.45),
+                  style: const TextStyle(fontSize: 14, color: Color(0xFFE2E8F0), height: 1.5),
                 ),
               ),
             ),
@@ -571,7 +580,7 @@ class _MaterialPlanetDetailView extends StatelessWidget {
                     Expanded(
                       child: Text(
                         body.funFact,
-                        style: const TextStyle(fontSize: 13.5, color: Colors.white, height: 1.4),
+                        style: const TextStyle(fontSize: 13.5, color: Colors.white, height: 1.45),
                       ),
                     ),
                   ],
@@ -600,6 +609,7 @@ class _MaterialPlanetDetailView extends StatelessWidget {
                       contentPadding: EdgeInsets.zero,
                       title: const Text('Auto-Rotate Sphere', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                       value: provider.isRotating,
+                      activeColor: body.themeColor,
                       onChanged: (_) {
                         HapticFeedback.lightImpact();
                         provider.toggleRotation();
@@ -617,6 +627,7 @@ class _MaterialPlanetDetailView extends StatelessWidget {
                       value: provider.rotationSpeed,
                       min: AppConstants.minRotationSpeed,
                       max: AppConstants.maxRotationSpeed,
+                      activeColor: body.themeColor,
                       onChanged: provider.isRotating
                           ? (val) => provider.setRotationSpeed(val)
                           : null,

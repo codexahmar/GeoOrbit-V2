@@ -1,4 +1,4 @@
-package com.example.orbit_360
+package com.solaris.solarsystem
 
 import io.flutter.embedding.android.FlutterActivity
 

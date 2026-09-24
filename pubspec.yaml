@@ -1,7 +1,7 @@
-name: cosmic_globe
-description: A modern, interactive 3D globe visualization app with state management
+name: solaris_solar_system
+description: "Solaris: Interactive 3D Solar System & Planetary Encyclopedia"
 
-version: 1.0.0
+version: 1.0.0+1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

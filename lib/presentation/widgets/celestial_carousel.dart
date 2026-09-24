@@ -20,7 +20,7 @@ class CelestialCarousel extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// iOS Cupertino Native Celestial Carousel (Apple HIG Horizontal Strip)
+// iOS Cupertino Native Celestial Carousel (Apple HIG Horizontal Glass Strip)
 // ---------------------------------------------------------------------------
 class _CupertinoCelestialCarouselView extends StatelessWidget {
   const _CupertinoCelestialCarouselView();
@@ -33,7 +33,7 @@ class _CupertinoCelestialCarouselView extends StatelessWidget {
         final selectedId = provider.selectedBody.id;
 
         return SizedBox(
-          height: 104,
+          height: 106,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
@@ -51,25 +51,25 @@ class _CupertinoCelestialCarouselView extends StatelessWidget {
                     provider.selectCelestialBody(body);
                   },
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
+                    duration: const Duration(milliseconds: 240),
                     curve: Curves.easeOutCubic,
                     width: isSelected ? 116 : 94,
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? const Color(0xFF1B233D)
-                          : const Color(0xCC0E1428),
-                      borderRadius: BorderRadius.circular(18),
+                          ? const Color(0xE61E2847)
+                          : const Color(0xB30E1428),
+                      borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: isSelected
                             ? body.themeColor
-                            : const Color(0x26FFFFFF),
+                            : const Color(0x28FFFFFF),
                         width: isSelected ? 2.0 : 1.0,
                       ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: body.themeColor.withOpacity(0.4),
+                                color: body.themeColor.withOpacity(0.35),
                                 blurRadius: 12,
                                 offset: const Offset(0, 3),
                               ),
@@ -80,16 +80,25 @@ class _CupertinoCelestialCarouselView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Planet Spherical Thumbnail
-                        Container(
-                          width: isSelected ? 38 : 32,
-                          height: isSelected ? 38 : 32,
+                        // Planet Spherical Thumbnail with Cosmic Glow
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 240),
+                          width: isSelected ? 40 : 34,
+                          height: isSelected ? 40 : 34,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected
+                                  ? body.themeColor
+                                  : Colors.transparent,
+                              width: 1.5,
+                            ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.6),
-                                blurRadius: 6,
+                                color: isSelected
+                                    ? body.themeColor.withOpacity(0.5)
+                                    : Colors.black.withOpacity(0.5),
+                                blurRadius: isSelected ? 8 : 4,
                               ),
                             ],
                           ),
@@ -100,8 +109,9 @@ class _CupertinoCelestialCarouselView extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        // Planet Name (High Contrast White)
+                        const SizedBox(height: 5),
+
+                        // High Contrast Planet Name
                         Text(
                           body.name,
                           style: TextStyle(
@@ -112,13 +122,16 @@ class _CupertinoCelestialCarouselView extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        // Planet Type
+
+                        // Planet Type Tag
                         Text(
                           body.type.split(' ').first,
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
-                            color: isSelected ? body.themeColor : const Color(0xFF94A3B8),
+                            color: isSelected
+                                ? body.themeColor
+                                : const Color(0xFF94A3B8),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -150,9 +163,10 @@ class _MaterialCelestialCarouselView extends StatelessWidget {
         final selectedId = provider.selectedBody.id;
 
         return SizedBox(
-          height: 104,
+          height: 106,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
+            physics: const ClampingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 14),
             itemCount: bodies.length,
             itemBuilder: (context, index) {
@@ -164,21 +178,21 @@ class _MaterialCelestialCarouselView extends StatelessWidget {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(20),
                     onTap: () {
                       HapticFeedback.lightImpact();
                       provider.selectCelestialBody(body);
                     },
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 220),
+                      duration: const Duration(milliseconds: 240),
                       curve: Curves.easeOutCubic,
                       width: isSelected ? 116 : 94,
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.7)
-                            : Theme.of(context).colorScheme.surface.withOpacity(0.7),
-                        borderRadius: BorderRadius.circular(18),
+                            ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.75)
+                            : Theme.of(context).colorScheme.surface.withOpacity(0.75),
+                        borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: isSelected
                               ? Theme.of(context).colorScheme.primary
@@ -199,11 +213,27 @@ class _MaterialCelestialCarouselView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          CircleAvatar(
-                            radius: isSelected ? 19 : 16,
-                            backgroundImage: AssetImage(body.texturePath),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 240),
+                            width: isSelected ? 40 : 34,
+                            height: isSelected ? 40 : 34,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
+                            ),
+                            child: ClipOval(
+                              child: Image.asset(
+                                body.texturePath,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 5),
                           Text(
                             body.name,
                             style: TextStyle(

@@ -8,11 +8,11 @@ import 'presentation/screens/home_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const CosmicOrbitApp());
+  runApp(const SolarisApp());
 }
 
-class CosmicOrbitApp extends StatelessWidget {
-  const CosmicOrbitApp({super.key});
+class SolarisApp extends StatelessWidget {
+  const SolarisApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +24,14 @@ class CosmicOrbitApp extends StatelessWidget {
 
           if (isIOS) {
             return CupertinoApp(
-              title: 'GeoOrbit Pro',
+              title: 'Solaris 3D',
               debugShowCheckedModeBanner: false,
               theme: AppTheme.cupertinoDarkTheme,
               home: const HomeScreen(),
             );
           }
           return MaterialApp(
-            title: 'GeoOrbit Pro',
+            title: 'Solaris 3D',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.materialDarkTheme,
             darkTheme: AppTheme.materialDarkTheme,
