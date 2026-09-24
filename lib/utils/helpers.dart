@@ -1,5 +1,14 @@
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+bool isIOSPlatform(BuildContext context) {
+  if (kIsWeb) {
+    return defaultTargetPlatform == TargetPlatform.iOS;
+  }
+  return Theme.of(context).platform == TargetPlatform.iOS ||
+      defaultTargetPlatform == TargetPlatform.iOS;
+}
 
 class Helpers {
   // Calculate distance between two coordinates (Haversine formula)
@@ -35,47 +44,6 @@ class Helpers {
     return '${value.abs().toStringAsFixed(4)}° $direction';
   }
 
-  // Generate gradient color based on index
-  static Color getGradientColor(int index, int total) {
-    final hue = (index / total) * 360;
-    return HSVColor.fromAHSV(1.0, hue, 0.7, 0.9).toColor();
-  }
-
-  // Show custom snackbar
-  static void showCustomSnackbar(
-    BuildContext context, {
-    required String message,
-    required IconData icon,
-    required Color color,
-    Duration duration = const Duration(seconds: 2),
-  }) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(icon, color: Colors.white),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: color,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        duration: duration,
-      ),
-    );
-  }
-
   // Responsive font size
   static double getResponsiveFontSize(BuildContext context, double baseSize) {
     final width = MediaQuery.of(context).size.width;
@@ -91,27 +59,5 @@ class Helpers {
   // Check if device is in landscape mode
   static bool isLandscape(BuildContext context) {
     return MediaQuery.of(context).orientation == Orientation.landscape;
-  }
-
-  // Generate random position for particle effects
-  static Offset getRandomPosition(Size size) {
-    final random = math.Random();
-    return Offset(
-      random.nextDouble() * size.width,
-      random.nextDouble() * size.height,
-    );
-  }
-
-  // Lerp between colors
-  static Color lerpGradient(List<Color> colors, double t) {
-    if (colors.isEmpty) return Colors.transparent;
-    if (colors.length == 1) return colors[0];
-
-    final index = (t * (colors.length - 1)).floor();
-    final nextIndex = (index + 1).clamp(0, colors.length - 1);
-    final localT = (t * (colors.length - 1)) - index;
-
-    return Color.lerp(colors[index], colors[nextIndex], localT) ??
-        colors[index];
   }
 }

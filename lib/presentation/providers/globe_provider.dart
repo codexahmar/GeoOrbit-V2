@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_earth_globe/flutter_earth_globe_controller.dart';
 import 'package:flutter_earth_globe/globe_coordinates.dart';
@@ -21,6 +22,8 @@ class GlobeProvider extends ChangeNotifier {
   bool _isInitialized = false;
   bool _showConnections = true;
   bool _showLabels = true;
+  bool _isTourMode = false;
+  Timer? _tourTimer;
 
   FlutterEarthGlobeController get controller => _controller;
   List<LocationModel> get locations => _locations;
@@ -34,6 +37,7 @@ class GlobeProvider extends ChangeNotifier {
   double get zoom => _controller.zoom;
   bool get showConnections => _showConnections;
   bool get showLabels => _showLabels;
+  bool get isTourMode => _isTourMode;
 
   // ---------------- Initialization ----------------
 
@@ -85,9 +89,11 @@ class GlobeProvider extends ChangeNotifier {
   // ---------------- Controls ----------------
 
   void toggleRotation() {
-    _controller.isRotating
-        ? _controller.stopRotation()
-        : _controller.startRotation();
+    if (_controller.isRotating) {
+      _controller.stopRotation();
+    } else {
+      _controller.startRotation();
+    }
     notifyListeners();
   }
 
@@ -120,6 +126,43 @@ class GlobeProvider extends ChangeNotifier {
     setZoom(_controller.zoom - 0.1);
   }
 
+  // ---------------- Tour Mode Showcase ----------------
+
+  void toggleTourMode() {
+    _isTourMode = !_isTourMode;
+    if (_isTourMode) {
+      _startTour();
+    } else {
+      _stopTour();
+    }
+    notifyListeners();
+  }
+
+  void _startTour() {
+    _tourTimer?.cancel();
+    if (!_controller.isRotating) {
+      _controller.startRotation();
+    }
+    _setTourSpeed();
+
+    _tourTimer = Timer.periodic(const Duration(seconds: 8), (_) {
+      final all = CelestialBodyModel.allBodies;
+      final currentIndex = all.indexWhere((b) => b.id == _selectedBody?.id);
+      final nextIndex = (currentIndex + 1) % all.length;
+      selectCelestialBody(all[nextIndex]);
+    });
+  }
+
+  void _setTourSpeed() {
+    _controller.rotationSpeed = 0.08;
+  }
+
+  void _stopTour() {
+    _tourTimer?.cancel();
+    _tourTimer = null;
+    _isTourMode = false;
+  }
+
   // ---------------- Location Management ----------------
 
   void toggleLocation(LocationModel location) {
@@ -130,9 +173,11 @@ class GlobeProvider extends ChangeNotifier {
     _locations[index] = updated;
 
     if (_selectedBody?.id == 'earth') {
-      updated.isVisible
-          ? _controller.addPoint(updated.toPoint())
-          : _controller.removePoint(updated.id);
+      if (updated.isVisible) {
+        _controller.addPoint(updated.toPoint());
+      } else {
+        _controller.removePoint(updated.id);
+      }
     }
 
     notifyListeners();
@@ -156,6 +201,11 @@ class GlobeProvider extends ChangeNotifier {
   }
 
   void focusOnLocation(LocationModel location) {
+    // If not currently earth, switch to earth first
+    if (_selectedBody?.id != 'earth') {
+      final earth = CelestialBodyModel.allBodies.firstWhere((b) => b.id == 'earth');
+      selectCelestialBody(earth);
+    }
     _controller.focusOnCoordinates(location.coordinates, animate: true);
   }
 
@@ -234,7 +284,12 @@ class GlobeProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _tourTimer?.cancel();
+    if (_isInitialized) {
+      try {
+        _controller.dispose();
+      } catch (_) {}
+    }
     super.dispose();
   }
 }

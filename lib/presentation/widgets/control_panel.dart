@@ -1,398 +1,384 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../providers/globe_provider.dart';
-import 'location_manager.dart';
+import '../../utils/helpers.dart';
 
-class ControlPanel extends StatefulWidget {
-  const ControlPanel({Key? key}) : super(key: key);
-
-  @override
-  State<ControlPanel> createState() => _ControlPanelState();
-}
-
-class _ControlPanelState extends State<ControlPanel> {
-  final List<bool> _expanded = List.generate(3, (i) => i == 0 || i == 2);
+class ControlPanel extends StatelessWidget {
+  const ControlPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isTablet = constraints.maxWidth < 900;
-        final isMobile = constraints.maxWidth < 600;
-        final panelWidth = isMobile
-            ? double.infinity
-            : isTablet
-                ? constraints.maxWidth * 0.4
-                : AppConstants.panelWidthDesktop;
+    if (isIOSPlatform(context)) {
+      return const _CupertinoControlPanelView();
+    }
+    return const _MaterialControlPanelView();
+  }
+}
 
-        return Consumer<GlobeProvider>(
-          builder: (context, provider, _) {
-            return Container(
-              width: panelWidth,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.primaryDark,
-                    AppColors.secondaryDark.withOpacity(0.95),
-                  ],
-                ),
-                border: Border(
-                  right: BorderSide(color: AppColors.glassBorder, width: 1),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.neonBlue.withOpacity(0.1),
-                    blurRadius: 20,
-                    spreadRadius: 2,
+// ---------------------------------------------------------------------------
+// iOS Cupertino Native Control Panel (Clean Apple Inset Grouped)
+// ---------------------------------------------------------------------------
+class _CupertinoControlPanelView extends StatelessWidget {
+  const _CupertinoControlPanelView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<GlobeProvider>(
+      builder: (context, provider, _) {
+        final body = provider.selectedBody;
+
+        return CupertinoScrollbar(
+          child: ListView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            children: [
+              // 1. Current Body Section
+              CupertinoListSection.insetGrouped(
+                header: const Text('SELECTED CELESTIAL BODY'),
+                children: [
+                  CupertinoListTile(
+                    leading: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: const BoxDecoration(shape: BoxShape.circle),
+                      child: ClipOval(
+                        child: Image.asset(
+                          body?.texturePath ?? 'assets/2k_earth-day.jpg',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    title: Text(
+                      body?.name ?? 'Earth',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(body?.category ?? 'Planet'),
+                    trailing: Text(
+                      body?.diameter ?? '',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: CupertinoColors.secondaryLabel,
+                      ),
+                    ),
                   ),
                 ],
               ),
-              child: SafeArea(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.all(
-                    isMobile
-                        ? AppConstants.paddingSmall
-                        : AppConstants.paddingLarge,
+
+              // 2. Orbit Controls Section
+              CupertinoListSection.insetGrouped(
+                header: const Text('CONTROLS'),
+                children: [
+                  CupertinoListTile(
+                    leading: _buildIconBadge(
+                      icon: CupertinoIcons.arrow_2_circlepath,
+                      color: CupertinoColors.activeBlue,
+                    ),
+                    title: const Text('Auto-Rotate'),
+                    trailing: CupertinoSwitch(
+                      value: provider.isRotating,
+                      onChanged: (_) {
+                        HapticFeedback.selectionClick();
+                        provider.toggleRotation();
+                      },
+                    ),
                   ),
-                  child: Column(
-                    children: [
-                      _buildSection(
-                        index: 0,
-                        icon: Icons.public,
-                        title: "Globe Controls",
-                        child: Column(
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _buildRotationControl(provider, isMobile),
-                            const SizedBox(height: 12),
-                            _buildRotationSpeedSlider(provider, isMobile),
-                            const SizedBox(height: 12),
-                            _buildZoomControl(provider, isMobile),
+                            const Text('Rotation Speed', style: TextStyle(fontSize: 15)),
+                            Text(
+                              '${(provider.rotationSpeed * 100).toStringAsFixed(1)}x',
+                              style: const TextStyle(color: CupertinoColors.secondaryLabel),
+                            ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildSection(
-                        index: 1,
-                        icon: Icons.analytics,
-                        title: "Statistics",
-                        child: _buildStatistics(provider, isMobile),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildSection(
-                        index: 2,
-                        icon: Icons.location_on,
-                        title: "Locations",
-                        child: const LocationManager(),
-                      ),
-                    ],
+                        const SizedBox(height: 6),
+                        CupertinoSlider(
+                          value: provider.rotationSpeed,
+                          min: AppConstants.minRotationSpeed,
+                          max: AppConstants.maxRotationSpeed,
+                          onChanged: provider.isRotating
+                              ? (val) => provider.setRotationSpeed(val)
+                              : null,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Zoom Level', style: TextStyle(fontSize: 15)),
+                            Text(
+                              '${(provider.zoom * 100).toInt()}%',
+                              style: const TextStyle(color: CupertinoColors.secondaryLabel),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        CupertinoSlider(
+                          value: provider.zoom,
+                          min: AppConstants.minZoom,
+                          max: AppConstants.maxZoom,
+                          onChanged: (val) => provider.setZoom(val),
+                        ),
+                      ],
+                    ),
+                  ),
+                  CupertinoListTile(
+                    leading: _buildIconBadge(
+                      icon: CupertinoIcons.arrow_counterclockwise,
+                      color: CupertinoColors.systemOrange,
+                    ),
+                    title: const Text('Reset Camera'),
+                    trailing: CupertinoButton(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      color: CupertinoColors.systemGrey5,
+                      borderRadius: BorderRadius.circular(8),
+                      onPressed: () {
+                        HapticFeedback.selectionClick();
+                        provider.resetRotation();
+                      },
+                      child: const Text(
+                        'Reset',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: CupertinoColors.activeBlue,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            );
-          },
+
+              // 3. Earth Waypoints Section
+              CupertinoListSection.insetGrouped(
+                header: const Text('EARTH WAYPOINTS'),
+                children: [
+                  CupertinoListTile(
+                    leading: _buildIconBadge(
+                      icon: CupertinoIcons.airplane,
+                      color: CupertinoColors.systemPink,
+                    ),
+                    title: const Text('Flight Trajectories'),
+                    trailing: CupertinoSwitch(
+                      value: provider.showConnections,
+                      onChanged: (_) {
+                        HapticFeedback.selectionClick();
+                        provider.toggleConnections();
+                      },
+                    ),
+                  ),
+                  for (final location in provider.locations)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: location.color,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  location.name,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: location.isVisible
+                                        ? CupertinoColors.label.resolveFrom(context)
+                                        : CupertinoColors.tertiaryLabel.resolveFrom(context),
+                                  ),
+                                ),
+                                Text(
+                                  'Lat ${location.coordinates.latitude.toStringAsFixed(1)}°, Lon ${location.coordinates.longitude.toStringAsFixed(1)}°',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: CupertinoColors.secondaryLabel,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (location.isVisible)
+                            CupertinoButton(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              onPressed: () {
+                                HapticFeedback.selectionClick();
+                                provider.focusOnLocation(location);
+                              },
+                              child: const Text('Focus', style: TextStyle(fontSize: 13)),
+                            ),
+                          CupertinoSwitch(
+                            value: location.isVisible,
+                            onChanged: (_) {
+                              HapticFeedback.selectionClick();
+                              provider.toggleLocation(location);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
         );
       },
     );
   }
 
-  Widget _buildSection({
-    required int index,
-    required IconData icon,
-    required String title,
-    required Widget child,
-  }) {
+  Widget _buildIconBadge({required IconData icon, required Color color}) {
     return Container(
+      width: 28,
+      height: 28,
       decoration: BoxDecoration(
-        color: AppColors.glassBackground,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.glassBorder, width: 1),
+        color: color,
+        borderRadius: BorderRadius.circular(6),
       ),
-      child: ExpansionTile(
-        initiallyExpanded: _expanded[index],
-        onExpansionChanged: (expanded) =>
-            setState(() => _expanded[index] = expanded),
-        tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        iconColor: AppColors.neonBlue,
-        collapsedIconColor: AppColors.textSecondary,
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: AppColors.nebulaGradient),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: Colors.white, size: 18),
-            ),
-            const SizedBox(width: 10),
-            Flexible(
-              child: Text(
-                title,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ),
-          ],
-        ),
-        childrenPadding:
-            const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-        children: [child],
-      ),
+      child: Icon(icon, color: CupertinoColors.white, size: 16),
     );
   }
+}
 
-  Widget _buildRotationControl(GlobeProvider provider, bool isMobile) {
-    return _buildGlassContainer(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Row(
+// ---------------------------------------------------------------------------
+// Android Material 3 Native Control Panel
+// ---------------------------------------------------------------------------
+class _MaterialControlPanelView extends StatelessWidget {
+  const _MaterialControlPanelView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<GlobeProvider>(
+      builder: (context, provider, _) {
+        final body = provider.selectedBody;
+
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            // Selected Body Card
+            Card.filled(
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: AssetImage(body?.texturePath ?? 'assets/2k_earth-day.jpg'),
+                ),
+                title: Text(body?.name ?? 'Earth', style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(body?.category ?? 'Planet'),
+                trailing: Text(body?.diameter ?? ''),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Controls Card
+            Card.outlined(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      provider.isRotating
-                          ? Icons.play_circle_filled
-                          : Icons.pause_circle_filled,
-                      color: AppColors.neonBlue,
-                      size: 24,
+                    Text('Controls', style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Auto-Rotate'),
+                      value: provider.isRotating,
+                      onChanged: (_) => provider.toggleRotation(),
                     ),
-                    const SizedBox(width: 10),
-                    const Flexible(
-                      child: Text(
-                        'Auto Rotation',
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
+                    const SizedBox(height: 8),
+                    Text('Speed: ${(provider.rotationSpeed * 100).toStringAsFixed(1)}x'),
+                    Slider(
+                      value: provider.rotationSpeed,
+                      min: AppConstants.minRotationSpeed,
+                      max: AppConstants.maxRotationSpeed,
+                      onChanged: provider.isRotating
+                          ? (val) => provider.setRotationSpeed(val)
+                          : null,
+                    ),
+                    const SizedBox(height: 8),
+                    Text('Zoom: ${(provider.zoom * 100).toInt()}%'),
+                    Slider(
+                      value: provider.zoom,
+                      min: AppConstants.minZoom,
+                      max: AppConstants.maxZoom,
+                      onChanged: (val) => provider.setZoom(val),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.tonal(
+                        onPressed: () => provider.resetRotation(),
+                        child: const Text('Reset Camera'),
                       ),
                     ),
                   ],
                 ),
               ),
-              Transform.scale(
-                scale: isMobile ? 0.9 : 1.1,
-                child: Switch(
-                  value: provider.isRotating,
-                  onChanged: (_) => provider.toggleRotation(),
-                  activeColor: AppColors.neonBlue,
+            ),
+            const SizedBox(height: 12),
+
+            // Waypoints Card
+            Card.outlined(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Earth Waypoints', style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Flight Trajectories'),
+                      value: provider.showConnections,
+                      onChanged: (_) => provider.toggleConnections(),
+                    ),
+                    const Divider(),
+                    for (final location in provider.locations)
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: CircleAvatar(radius: 6, backgroundColor: location.color),
+                        title: Text(location.name),
+                        subtitle: Text('Lat ${location.coordinates.latitude.toStringAsFixed(1)}°, Lon ${location.coordinates.longitude.toStringAsFixed(1)}°'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (location.isVisible)
+                              IconButton(
+                                icon: const Icon(Icons.my_location, size: 20),
+                                onPressed: () => provider.focusOnLocation(location),
+                              ),
+                            Switch(
+                              value: location.isVisible,
+                              onChanged: (_) => provider.toggleLocation(location),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: provider.isRotating ? provider.resetRotation : null,
-              icon: const Icon(Icons.refresh, size: 20),
-              label: const Text('Reset Position'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.glassBackground,
-                foregroundColor: AppColors.neonBlue,
-                elevation: 0,
-                padding: EdgeInsets.symmetric(
-                  vertical: isMobile ? 10 : 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: AppColors.neonBlue.withOpacity(0.3)),
-                ),
-              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRotationSpeedSlider(GlobeProvider provider, bool isMobile) {
-    return _buildGlassContainer(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _labelWithValue(
-            label: 'Rotation Speed',
-            value: provider.rotationSpeed.toStringAsFixed(2),
-          ),
-          Slider(
-            value: provider.rotationSpeed,
-            min: AppConstants.minRotationSpeed,
-            max: AppConstants.maxRotationSpeed,
-            activeColor: AppColors.neonBlue,
-            inactiveColor: AppColors.tertiaryDark,
-            onChanged: provider.isRotating ? provider.setRotationSpeed : null,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildZoomControl(GlobeProvider provider, bool isMobile) {
-    return _buildGlassContainer(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _labelWithValue(
-              label: 'Zoom Level', value: '${(provider.zoom * 100).toInt()}%'),
-          Slider(
-            value: provider.zoom,
-            min: AppConstants.minZoom,
-            max: AppConstants.maxZoom,
-            divisions: 12,
-            activeColor: AppColors.neonBlue,
-            inactiveColor: AppColors.tertiaryDark,
-            onChanged: provider.setZoom,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: provider.zoomOut,
-                icon: const Icon(Icons.remove_circle_outline),
-                color: AppColors.neonBlue,
-                iconSize: 22,
-              ),
-              IconButton(
-                onPressed: provider.zoomIn,
-                icon: const Icon(Icons.add_circle_outline),
-                color: AppColors.neonBlue,
-                iconSize: 22,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatistics(GlobeProvider provider, bool isMobile) {
-    return Column(
-      children: [
-        _buildStatCard(
-          icon: Icons.location_on,
-          label: 'Active Locations',
-          value: provider.locations.where((l) => l.isVisible).length.toString(),
-          color: AppColors.neonBlue,
-        ),
-        const SizedBox(height: 8),
-        _buildStatCard(
-          icon: Icons.link,
-          label: 'Connections',
-          value: provider.showConnections
-              ? provider.connections.length.toString()
-              : '0',
-          color: AppColors.neonPurple,
-        ),
-        const SizedBox(height: 8),
-        _buildStatCard(
-          icon: Icons.public,
-          label: 'Current Body',
-          value: provider.selectedBody?.name ?? 'None',
-          color: AppColors.neonPink,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatCard({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return _buildGlassContainer(
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: color, size: 22),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textSecondary,
-                    )),
-                Text(value,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    )),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _labelWithValue({required String label, required String value}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Flexible(
-          child: Text(
-            label,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.neonBlue.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: AppColors.neonBlue,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGlassContainer({required Widget child}) {
-    return Container(
-      padding: const EdgeInsets.all(AppConstants.paddingMedium),
-      decoration: BoxDecoration(
-        color: AppColors.glassBackground,
-        borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-        border: Border.all(color: AppColors.glassBorder, width: 1),
-      ),
-      child: child,
+          ],
+        );
+      },
     );
   }
 }
