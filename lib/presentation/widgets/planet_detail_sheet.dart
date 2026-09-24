@@ -36,12 +36,12 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(18, 14, 18, 40),
             children: [
-              // 1. Planet Header Card (Fully visible at the very top)
+              // 1. Planet Hero Card (Fully visible at top with radiant aura)
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppColors.cardElevated,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(22),
                   border: Border.all(
                     color: body.themeColor.withOpacity(0.55),
                     width: 1.2,
@@ -49,22 +49,23 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                   boxShadow: [
                     BoxShadow(
                       color: body.themeColor.withOpacity(0.18),
-                      blurRadius: 16,
+                      blurRadius: 18,
                       offset: const Offset(0, 4),
                     ),
                   ],
                 ),
                 child: Row(
                   children: [
+                    // Spherical Planet Preview
                     Container(
-                      width: 64,
-                      height: 64,
+                      width: 66,
+                      height: 66,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: body.themeColor.withOpacity(0.4),
-                            blurRadius: 12,
+                            color: body.themeColor.withOpacity(0.45),
+                            blurRadius: 14,
                           ),
                         ],
                       ),
@@ -98,6 +99,15 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                               color: body.themeColor,
                             ),
                           ),
+                          const SizedBox(height: 2),
+                          Text(
+                            body.distanceFromSun,
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -115,7 +125,7 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.cardDark,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0x1FFFFFFF)),
+                  border: Border.all(color: const Color(0x1AFFFFFF)),
                 ),
                 child: Text(
                   body.description,
@@ -130,8 +140,8 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
 
               const SizedBox(height: 18),
 
-              // 3. Key Quick Facts & Measurements Grid
-              _buildSectionTitle('MEASUREMENTS & ORBIT'),
+              // 3. Key Quick Facts & Measurements Bento Grid
+              _buildSectionTitle('MEASUREMENTS & ORBITAL TELEMETRY'),
               const SizedBox(height: 8),
               _buildCupertinoMetricGrid(body),
 
@@ -139,14 +149,14 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
 
               // 4. Atmospheric Breakdown
               if (body.atmosphere.isNotEmpty) ...[
-                _buildSectionTitle('ATMOSPHERE COMPOSITION'),
+                _buildSectionTitle('ATMOSPHERIC COMPOSITION'),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: AppColors.cardDark,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0x1FFFFFFF)),
+                    border: Border.all(color: const Color(0x1AFFFFFF)),
                   ),
                   child: Column(
                     children: body.atmosphere.entries.map((entry) {
@@ -182,7 +192,7 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                             Container(
                               height: 6,
                               decoration: BoxDecoration(
-                                color: const Color(0x1FFFFFFF),
+                                color: const Color(0x1AFFFFFF),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Align(
@@ -219,6 +229,12 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                     color: const Color(0xFFFFB703).withOpacity(0.6),
                     width: 1.2,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFFB703).withOpacity(0.08),
+                      blurRadius: 12,
+                    ),
+                  ],
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,10 +270,10 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
     return Text(
       title,
       style: const TextStyle(
-        fontSize: 11.5,
+        fontSize: 11,
         fontWeight: FontWeight.w700,
         color: AppColors.textSecondary,
-        letterSpacing: 0.8,
+        letterSpacing: 0.9,
       ),
     );
   }
@@ -319,7 +335,7 @@ class _CupertinoPlanetDetailView extends StatelessWidget {
                 child: Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 11.5,
+                    fontSize: 11,
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
@@ -365,11 +381,11 @@ class _MaterialPlanetDetailView extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.fromLTRB(18, 14, 18, 40),
           children: [
-            // 1. Planet Header Card (Fully visible at the very top)
+            // 1. Planet Header Card (Fully visible at top)
             Card.filled(
               color: AppColors.cardElevated,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(22),
                 side: BorderSide(color: body.themeColor.withOpacity(0.55), width: 1.2),
               ),
               child: Padding(
@@ -377,7 +393,7 @@ class _MaterialPlanetDetailView extends StatelessWidget {
                 child: Row(
                   children: [
                     CircleAvatar(
-                      radius: 32,
+                      radius: 33,
                       backgroundImage: AssetImage(body.texturePath),
                     ),
                     const SizedBox(width: 16),
@@ -401,6 +417,14 @@ class _MaterialPlanetDetailView extends StatelessWidget {
                               fontSize: 13,
                             ),
                           ),
+                          const SizedBox(height: 2),
+                          Text(
+                            body.distanceFromSun,
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -417,7 +441,7 @@ class _MaterialPlanetDetailView extends StatelessWidget {
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 0.8,
+                    letterSpacing: 0.9,
                   ),
             ),
             const SizedBox(height: 6),
@@ -435,11 +459,11 @@ class _MaterialPlanetDetailView extends StatelessWidget {
 
             // 3. Key Measurements Grid
             Text(
-              'MEASUREMENTS & ORBIT',
+              'MEASUREMENTS & ORBITAL TELEMETRY',
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 0.8,
+                    letterSpacing: 0.9,
                   ),
             ),
             const SizedBox(height: 6),
@@ -450,11 +474,11 @@ class _MaterialPlanetDetailView extends StatelessWidget {
             // 4. Atmosphere
             if (body.atmosphere.isNotEmpty) ...[
               Text(
-                'ATMOSPHERE',
+                'ATMOSPHERIC COMPOSITION',
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 0.8,
+                      letterSpacing: 0.9,
                     ),
               ),
               const SizedBox(height: 6),
@@ -499,7 +523,7 @@ class _MaterialPlanetDetailView extends StatelessWidget {
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 0.8,
+                    letterSpacing: 0.9,
                   ),
             ),
             const SizedBox(height: 6),
@@ -584,7 +608,7 @@ class _MaterialPlanetDetailView extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(fontSize: 11.5, color: AppColors.textSecondary),
+                    style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

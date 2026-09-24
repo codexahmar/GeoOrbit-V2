@@ -86,29 +86,51 @@ class _AnimatedGlobeContainerState extends State<AnimatedGlobeContainer>
             return Stack(
               alignment: Alignment.center,
               children: [
-                // Atmospheric Volumetric Aura Glow (Subtle backlighting)
+                // Layer 1: Outer Atmospheric Nebula Haze
                 AnimatedBuilder(
                   animation: _transitionController,
                   builder: (context, child) {
                     return Container(
-                      width: radius * 2.8,
-                      height: radius * 2.8,
+                      width: radius * 3.2,
+                      height: radius * 3.2,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
                           colors: [
-                            auraColor.withOpacity(0.24 * _fadeAnimation.value),
-                            auraColor.withOpacity(0.06 * _fadeAnimation.value),
+                            auraColor.withOpacity(0.16 * _fadeAnimation.value),
+                            auraColor.withOpacity(0.04 * _fadeAnimation.value),
                             Colors.transparent,
                           ],
-                          stops: const [0.0, 0.48, 1.0],
+                          stops: const [0.0, 0.45, 1.0],
                         ),
                       ),
                     );
                   },
                 ),
 
-                // 3D High Definition Globe Sphere (Perfect proportional radius)
+                // Layer 2: Inner High-Intensity Planetary Corona
+                AnimatedBuilder(
+                  animation: _transitionController,
+                  builder: (context, child) {
+                    return Container(
+                      width: radius * 2.2,
+                      height: radius * 2.2,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            auraColor.withOpacity(0.26 * _fadeAnimation.value),
+                            auraColor.withOpacity(0.08 * _fadeAnimation.value),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.55, 1.0],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                // Layer 3: 3D High Definition Globe Sphere (Perfect proportional radius)
                 FadeTransition(
                   opacity: _fadeAnimation,
                   child: ScaleTransition(
@@ -130,8 +152,8 @@ class _AnimatedGlobeContainerState extends State<AnimatedGlobeContainer>
   double _calculateRadius(Size size) {
     final minDim = min(size.width, size.height);
     if (minDim < AppConstants.mobileBreakpoint) {
-      // Reduced proportional radius so planet never touches HUD or bottom bar
-      return (minDim * 0.27).clamp(95.0, 138.0);
+      // Proportional radius leaving clean breathing room
+      return (minDim * 0.27).clamp(96.0, 138.0);
     } else if (minDim < AppConstants.tabletBreakpoint) {
       return (minDim * 0.25).clamp(130.0, 190.0);
     } else {

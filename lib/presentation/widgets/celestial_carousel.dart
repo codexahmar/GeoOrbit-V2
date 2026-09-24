@@ -46,6 +46,7 @@ class _CupertinoCelestialCarouselView extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final body = bodies[index];
                   final isSelected = body.id == selectedId;
+                  final indexStr = (index + 1).toString().padLeft(2, '0');
 
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -62,12 +63,12 @@ class _CupertinoCelestialCarouselView extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isSelected
                               ? AppColors.cardElevated
-                              : AppColors.cardDark.withOpacity(0.9),
+                              : AppColors.cardDark.withOpacity(0.92),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: isSelected
                                 ? body.themeColor
-                                : const Color(0x22FFFFFF),
+                                : const Color(0x1FFFFFFF),
                             width: isSelected ? 1.8 : 0.8,
                           ),
                           boxShadow: isSelected
@@ -80,65 +81,86 @@ class _CupertinoCelestialCarouselView extends StatelessWidget {
                                 ]
                               : null,
                         ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
+                        child: Stack(
                           children: [
-                            // Planet Spherical Thumbnail with Cosmic Glow
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 240),
-                              width: isSelected ? 42 : 35,
-                              height: isSelected ? 42 : 35,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
+                            // Order index in top-right corner
+                            Positioned(
+                              top: 2,
+                              right: 4,
+                              child: Text(
+                                indexStr,
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w700,
                                   color: isSelected
-                                      ? body.themeColor
-                                      : Colors.transparent,
-                                  width: 1.5,
+                                      ? body.themeColor.withOpacity(0.8)
+                                      : const Color(0xFF52525B),
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: isSelected
-                                        ? body.themeColor.withOpacity(0.55)
-                                        : Colors.black.withOpacity(0.5),
-                                    blurRadius: isSelected ? 8 : 4,
+                              ),
+                            ),
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // Planet Spherical Thumbnail with Cosmic Glow
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 240),
+                                    width: isSelected ? 42 : 35,
+                                    height: isSelected ? 42 : 35,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? body.themeColor
+                                            : Colors.transparent,
+                                        width: 1.5,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: isSelected
+                                              ? body.themeColor.withOpacity(0.55)
+                                              : Colors.black.withOpacity(0.5),
+                                          blurRadius: isSelected ? 8 : 4,
+                                        ),
+                                      ],
+                                    ),
+                                    child: ClipOval(
+                                      child: Image.asset(
+                                        body.texturePath,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+
+                                  // High Contrast Planet Name
+                                  Text(
+                                    body.name,
+                                    style: TextStyle(
+                                      fontSize: isSelected ? 12.5 : 11.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: CupertinoColors.white,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+
+                                  // Planet Type Tag
+                                  Text(
+                                    body.type.split(' ').first,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: isSelected
+                                          ? body.themeColor
+                                          : AppColors.textSecondary,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
-                              child: ClipOval(
-                                child: Image.asset(
-                                  body.texturePath,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-
-                            // High Contrast Planet Name
-                            Text(
-                              body.name,
-                              style: TextStyle(
-                                fontSize: isSelected ? 12.5 : 11.5,
-                                fontWeight: FontWeight.w700,
-                                color: CupertinoColors.white,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-
-                            // Planet Type Tag
-                            Text(
-                              body.type.split(' ').first,
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: isSelected
-                                    ? body.themeColor
-                                    : AppColors.textSecondary,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
@@ -156,7 +178,7 @@ class _CupertinoCelestialCarouselView extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Android Material 3 Native Celestial Carousel (Floating M3 Dock)
+// Android Material 3 Native Celestial Carousel (Floating M3 Strip)
 // ---------------------------------------------------------------------------
 class _MaterialCelestialCarouselView extends StatelessWidget {
   const _MaterialCelestialCarouselView();
@@ -182,6 +204,7 @@ class _MaterialCelestialCarouselView extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final body = bodies[index];
                   final isSelected = body.id == selectedId;
+                  final indexStr = (index + 1).toString().padLeft(2, '0');
 
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -201,7 +224,7 @@ class _MaterialCelestialCarouselView extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? AppColors.cardElevated
-                                : AppColors.cardDark.withOpacity(0.9),
+                                : AppColors.cardDark.withOpacity(0.92),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: isSelected
@@ -210,61 +233,81 @@ class _MaterialCelestialCarouselView extends StatelessWidget {
                               width: isSelected ? 1.8 : 0.8,
                             ),
                             boxShadow: isSelected
-                                ? [
-                                    BoxShadow(
-                                      color: body.themeColor.withOpacity(0.35),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ]
-                                : null,
+                              ? [
+                                  BoxShadow(
+                                    color: body.themeColor.withOpacity(0.35),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ]
+                              : null,
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
+                          child: Stack(
                             children: [
-                              AnimatedContainer(
-                                duration: const Duration(milliseconds: 240),
-                                width: isSelected ? 42 : 35,
-                                height: isSelected ? 42 : 35,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
+                              Positioned(
+                                top: 2,
+                                right: 4,
+                                child: Text(
+                                  indexStr,
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
                                     color: isSelected
-                                        ? body.themeColor
-                                        : Colors.transparent,
-                                    width: 1.5,
-                                  ),
-                                ),
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    body.texturePath,
-                                    fit: BoxFit.cover,
+                                        ? body.themeColor.withOpacity(0.8)
+                                        : const Color(0xFF52525B),
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 5),
-                              Text(
-                                body.name,
-                                style: TextStyle(
-                                  fontSize: isSelected ? 12.5 : 11.5,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                              Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    AnimatedContainer(
+                                      duration: const Duration(milliseconds: 240),
+                                      width: isSelected ? 42 : 35,
+                                      height: isSelected ? 42 : 35,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: isSelected
+                                              ? body.themeColor
+                                              : Colors.transparent,
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                      child: ClipOval(
+                                        child: Image.asset(
+                                          body.texturePath,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      body.name,
+                                      style: TextStyle(
+                                        fontSize: isSelected ? 12.5 : 11.5,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Text(
+                                      body.type.split(' ').first,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600,
+                                        color: isSelected
+                                            ? body.themeColor
+                                            : AppColors.textSecondary,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Text(
-                                body.type.split(' ').first,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  color: isSelected
-                                      ? body.themeColor
-                                      : AppColors.textSecondary,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),

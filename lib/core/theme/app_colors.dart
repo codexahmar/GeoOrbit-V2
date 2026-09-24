@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
-/// Ultra-sleek cinematic OLED & Apple Graphite color tokens
+/// Ultra-premium cinematic OLED & Apple Graphite color tokens
 class AppColors {
-  // Deep OLED Space Canvas (No muddy dark blues - pure cinematic contrast)
+  // Deep OLED Space Canvas (Pure pitch black for viral video contrast)
   static const Color voidBlack = Color(0xFF000000);
-  static const Color spaceBlack = Color(0xFF060608);
-  static const Color primaryDark = Color(0xFF111215);
-  static const Color secondaryDark = Color(0xFF18191E);
-  static const Color tertiaryDark = Color(0xFF22242B);
-  static const Color cardDark = Color(0xFF141519);
-  static const Color cardElevated = Color(0xFF1E1F25);
-  static const Color cardSurface = Color(0xFF262832);
+  static const Color spaceBlack = Color(0xFF050507);
+  static const Color primaryDark = Color(0xFF0F1014);
+  static const Color secondaryDark = Color(0xFF16171D);
+  static const Color tertiaryDark = Color(0xFF1F2128);
+  static const Color cardDark = Color(0xFF121318);
+  static const Color cardElevated = Color(0xFF1A1B22);
+  static const Color cardSurface = Color(0xFF22242E);
 
-  // High-Energy Planetary Spectral Accents (Vibrant for video recordings)
+  // High-Energy Planetary Spectral Accents (Vibrant on OLED and video recording)
   static const Color neonCyan = Color(0xFF00F2FE);
   static const Color neonSky = Color(0xFF38BDF8);
   static const Color neonPurple = Color(0xFFA855F7);
@@ -24,7 +24,7 @@ class AppColors {
   static const Color neonOrange = Color(0xFFFF6B35);
   static const Color neonCrimson = Color(0xFFFF3366);
 
-  // Spectral Planetary Glows
+  // Spectral Planetary Corona Glows
   static const Color earthGlow = Color(0xFF00D9FF);
   static const Color sunGlow = Color(0xFFFF9E00);
   static const Color moonGlow = Color(0xFFE4E4E7);
@@ -36,11 +36,11 @@ class AppColors {
   static const Color uranusGlow = Color(0xFF38BDF8);
   static const Color neptuneGlow = Color(0xFF3B82F6);
 
-  // Cinematic Deep Space Gradients (Pure OLED contrast)
+  // Gradients
   static const List<Color> cosmicDeepGradient = [
     Color(0xFF000000),
-    Color(0xFF050507),
-    Color(0xFF0A0B10),
+    Color(0xFF040406),
+    Color(0xFF090A0E),
   ];
 
   static const List<Color> auroraCyanPurple = [
@@ -59,12 +59,12 @@ class AppColors {
   static const Color glassSurface = Color(0x18FFFFFF);
   static const Color glassSurfaceMedium = Color(0x24FFFFFF);
   static const Color glassSurfaceStrong = Color(0x36FFFFFF);
-  static const Color glassBorder = Color(0x22FFFFFF);
-  static const Color glassBorderSubtle = Color(0x12FFFFFF);
+  static const Color glassBorder = Color(0x1FFFFFFF);
+  static const Color glassBorderSubtle = Color(0x10FFFFFF);
   static const Color glassBorderCyan = Color(0x6600F2FE);
   static const Color glassBorderPurple = Color(0x668B5CF6);
 
-  // Crisp High-Contrast Typography (Stands out crisply in video compression)
+  // High-Contrast Screen-Recording Typography
   static const Color textPrimary = Color(0xFFFFFFFF);
   static const Color textSecondary = Color(0xFFA1A1AA);
   static const Color textTertiary = Color(0xFF71717A);

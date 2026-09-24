@@ -35,6 +35,8 @@ class _CupertinoTelemetryHudView extends StatelessWidget {
     return Consumer<GlobeProvider>(
       builder: (context, provider, _) {
         final body = provider.selectedBody;
+        final currentIndex = provider.allBodies.indexWhere((b) => b.id == body.id) + 1;
+        final totalCount = provider.allBodies.length;
 
         return SafeArea(
           bottom: false,
@@ -47,15 +49,15 @@ class _CupertinoTelemetryHudView extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    color: const Color(0xCC141519), // Apple Graphite Frosted Glass
+                    color: const Color(0xCC121318), // Apple Graphite Frosted Glass
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: const Color(0x28FFFFFF),
+                      color: const Color(0x24FFFFFF),
                       width: 0.8,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.4),
+                        color: Colors.black.withOpacity(0.5),
                         blurRadius: 16,
                         offset: const Offset(0, 4),
                       ),
@@ -65,14 +67,14 @@ class _CupertinoTelemetryHudView extends StatelessWidget {
                     children: [
                       // Glowing Status Orb
                       Container(
-                        width: 9,
-                        height: 9,
+                        width: 10,
+                        height: 10,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: body.themeColor,
                           boxShadow: [
                             BoxShadow(
-                              color: body.themeColor.withOpacity(0.8),
+                              color: body.themeColor.withOpacity(0.85),
                               blurRadius: 8,
                               spreadRadius: 1,
                             ),
@@ -81,7 +83,7 @@ class _CupertinoTelemetryHudView extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
 
-                      // Planet Name & Quick Spec
+                      // Planet Name & Telemetry Index
                       Expanded(
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 250),
@@ -103,7 +105,7 @@ class _CupertinoTelemetryHudView extends StatelessWidget {
                               Text(
                                 body.name,
                                 style: const TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 18.5,
                                   fontWeight: FontWeight.w800,
                                   color: CupertinoColors.white,
                                   letterSpacing: -0.4,
@@ -111,11 +113,12 @@ class _CupertinoTelemetryHudView extends StatelessWidget {
                               ),
                               const SizedBox(height: 1),
                               Text(
-                                '${body.type} • ${body.diameter}',
-                                style: const TextStyle(
-                                  fontSize: 11.5,
-                                  color: AppColors.textSecondary,
-                                  fontWeight: FontWeight.w500,
+                                '${currentIndex.toString().padLeft(2, '0')}/$totalCount • ${body.type.toUpperCase()}',
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  color: body.themeColor.withOpacity(0.9),
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.6,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -125,7 +128,7 @@ class _CupertinoTelemetryHudView extends StatelessWidget {
                         ),
                       ),
 
-                      // Cupertino Facts Pill Button (Clean minimal design without sparkles)
+                      // Cupertino Facts Pill Button (Clean minimal design)
                       CupertinoButton(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                         color: const Color(0x28FFFFFF),
@@ -179,6 +182,8 @@ class _MaterialTelemetryHudView extends StatelessWidget {
     return Consumer<GlobeProvider>(
       builder: (context, provider, _) {
         final body = provider.selectedBody;
+        final currentIndex = provider.allBodies.indexWhere((b) => b.id == body.id) + 1;
+        final totalCount = provider.allBodies.length;
 
         return SafeArea(
           bottom: false,
@@ -195,7 +200,7 @@ class _MaterialTelemetryHudView extends StatelessWidget {
                   color: AppColors.cardDark,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: const Color(0x28FFFFFF),
+                    color: const Color(0x24FFFFFF),
                     width: 0.8,
                   ),
                 ),
@@ -203,14 +208,14 @@ class _MaterialTelemetryHudView extends StatelessWidget {
                   children: [
                     // Planet Color Accent Dot
                     Container(
-                      width: 9,
-                      height: 9,
+                      width: 10,
+                      height: 10,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: body.themeColor,
                         boxShadow: [
                           BoxShadow(
-                            color: body.themeColor.withOpacity(0.7),
+                            color: body.themeColor.withOpacity(0.75),
                             blurRadius: 6,
                           ),
                         ],
@@ -235,10 +240,12 @@ class _MaterialTelemetryHudView extends StatelessWidget {
                                   ),
                             ),
                             Text(
-                              '${body.type} • ${body.diameter}',
-                              style: const TextStyle(
-                                fontSize: 11.5,
-                                color: AppColors.textSecondary,
+                              '${currentIndex.toString().padLeft(2, '0')}/$totalCount • ${body.type.toUpperCase()}',
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                color: body.themeColor,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.6,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -248,7 +255,7 @@ class _MaterialTelemetryHudView extends StatelessWidget {
                       ),
                     ),
 
-                    // Material 3 Facts Button (Clean minimal design without sparkles)
+                    // Material 3 Facts Button
                     FilledButton.tonalIcon(
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
