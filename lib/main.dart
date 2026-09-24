@@ -21,16 +21,17 @@ class CosmicOrbitApp extends StatelessWidget {
       child: Builder(
         builder: (context) {
           final isIOS = !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+
           if (isIOS) {
             return CupertinoApp(
-              title: 'Cosmic Globe',
+              title: 'GeoOrbit Pro',
               debugShowCheckedModeBanner: false,
               theme: AppTheme.cupertinoDarkTheme,
               home: const HomeScreen(),
             );
           }
           return MaterialApp(
-            title: 'Cosmic Globe',
+            title: 'GeoOrbit Pro',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.materialDarkTheme,
             darkTheme: AppTheme.materialDarkTheme,

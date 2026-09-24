@@ -26,11 +26,11 @@ class _AnimatedGlobeContainerState extends State<AnimatedGlobeContainer>
     super.initState();
 
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 900),
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
+    _scaleAnimation = Tween<double>(begin: 0.88, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
     );
 
@@ -62,39 +62,40 @@ class _AnimatedGlobeContainerState extends State<AnimatedGlobeContainer>
             if (!provider.isInitialized) {
               return Center(
                 child: isIOS
-                    ? const CupertinoActivityIndicator(radius: 14)
+                    ? const CupertinoActivityIndicator(radius: 16)
                     : const CircularProgressIndicator(color: AppColors.neonCyan),
               );
             }
 
-            final themeColor = provider.selectedBody?.themeColor ?? AppColors.neonCyan;
+            final auraColor = provider.selectedBody.glowColor ??
+                provider.selectedBody.themeColor;
 
             return Stack(
               alignment: Alignment.center,
               children: [
-                // Soft Atmospheric Radial Glow
+                // Atmospheric Volumetric Aura Glow
                 AnimatedBuilder(
                   animation: _animationController,
                   builder: (context, child) {
                     return Container(
-                      width: radius * 2.8,
-                      height: radius * 2.8,
+                      width: radius * 3.0,
+                      height: radius * 3.0,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
                           colors: [
-                            themeColor.withOpacity(0.12 * _fadeAnimation.value),
-                            themeColor.withOpacity(0.03 * _fadeAnimation.value),
+                            auraColor.withOpacity(0.18 * _fadeAnimation.value),
+                            auraColor.withOpacity(0.05 * _fadeAnimation.value),
                             Colors.transparent,
                           ],
-                          stops: const [0.0, 0.5, 1.0],
+                          stops: const [0.0, 0.45, 1.0],
                         ),
                       ),
                     );
                   },
                 ),
 
-                // High Definition 3D Globe Sphere
+                // 3D High Definition Globe Sphere
                 FadeTransition(
                   opacity: _fadeAnimation,
                   child: ScaleTransition(
@@ -102,8 +103,6 @@ class _AnimatedGlobeContainerState extends State<AnimatedGlobeContainer>
                     child: FlutterEarthGlobe(
                       controller: provider.controller,
                       radius: radius,
-                      onTap: provider.setClickCoordinates,
-                      onHover: provider.setHoverCoordinates,
                     ),
                   ),
                 ),
@@ -118,11 +117,11 @@ class _AnimatedGlobeContainerState extends State<AnimatedGlobeContainer>
   double _calculateRadius(Size size) {
     final minDim = min(size.width, size.height);
     if (minDim < AppConstants.mobileBreakpoint) {
-      return (minDim * 0.35).clamp(120.0, 180.0);
+      return (minDim * 0.38).clamp(130.0, 190.0);
     } else if (minDim < AppConstants.tabletBreakpoint) {
-      return (minDim * 0.32).clamp(160.0, 240.0);
+      return (minDim * 0.34).clamp(180.0, 260.0);
     } else {
-      return (minDim * 0.32).clamp(200.0, 340.0);
+      return (minDim * 0.32).clamp(220.0, 360.0);
     }
   }
 }

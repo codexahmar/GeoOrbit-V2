@@ -36,6 +36,7 @@ flutter:
   assets:
     - assets/
     - assets/2k_earth-day.jpg
+    - assets/2k_earth-night.jpg
     - assets/2k_jupiter.jpg
     - assets/2k_mars.jpg
     - assets/2k_mercury.jpg

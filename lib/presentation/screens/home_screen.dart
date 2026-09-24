@@ -6,9 +6,12 @@ import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../providers/globe_provider.dart';
 import '../../utils/helpers.dart';
+import '../widgets/ambient_space_background.dart';
 import '../widgets/animated_globe_container.dart';
-import '../widgets/control_panel.dart';
-import '../widgets/texture_selector.dart';
+import '../widgets/telemetry_hud.dart';
+import '../widgets/celestial_carousel.dart';
+import '../widgets/camera_control_dock.dart';
+import '../widgets/planet_detail_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,8 +21,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   @override
   void initState() {
     super.initState();
@@ -35,18 +36,23 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (ctx) => CupertinoPopupSurface(
         isSurfacePainted: false,
         child: Container(
-          height: MediaQuery.of(context).size.height * 0.82,
+          height: MediaQuery.of(context).size.height * 0.84,
           decoration: const BoxDecoration(
-            color: CupertinoColors.systemGroupedBackground,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            color: Color(0xFF10172D),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: CupertinoPageScaffold(
-            backgroundColor: CupertinoColors.systemGroupedBackground,
+            backgroundColor: const Color(0xFF10172D),
             navigationBar: CupertinoNavigationBar(
-              backgroundColor: const Color(0xE61C1C1E),
+              backgroundColor: const Color(0xE60D1326),
+              border: const Border(bottom: BorderSide(color: Color(0x33FFFFFF), width: 0.5)),
               middle: Text(
                 title,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 17,
+                  color: CupertinoColors.white,
+                ),
               ),
               trailing: CupertinoButton(
                 padding: EdgeInsets.zero,
@@ -76,16 +82,17 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: const Color(0xFF10172D),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        side: BorderSide(color: AppColors.glassBorder, width: 1),
       ),
       builder: (ctx) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.75,
+        height: MediaQuery.of(context).size.height * 0.82,
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -93,21 +100,37 @@ class _HomeScreenState extends State<HomeScreen> {
                     title,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(Icons.close_rounded, color: Colors.white),
                     onPressed: () => Navigator.of(ctx).pop(),
                   ),
                 ],
               ),
             ),
-            const Divider(),
+            const Divider(color: Color(0x26FFFFFF)),
             Expanded(child: child),
           ],
         ),
       ),
     );
+  }
+
+  void _openPlanetDetails(bool isIOS) {
+    final bodyName = Provider.of<GlobeProvider>(context, listen: false).selectedBody.name;
+    if (isIOS) {
+      _showCupertinoSheet(
+        title: '$bodyName Study Guide',
+        child: const PlanetDetailSheet(),
+      );
+    } else {
+      _showMaterialBottomSheet(
+        title: '$bodyName Study Guide',
+        child: const PlanetDetailSheet(),
+      );
+    }
   }
 
   @override
@@ -123,178 +146,92 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // -------------------------------------------------------------------------
-  // iOS Cupertino Screen (Apple Maps & Fitness Pro Feel)
+  // iOS Cupertino Screen
   // -------------------------------------------------------------------------
   Widget _buildCupertinoHomeScreen(bool isMobile) {
-    return Consumer<GlobeProvider>(
-      builder: (context, provider, _) {
-        final body = provider.selectedBody;
+    return CupertinoPageScaffold(
+      backgroundColor: AppColors.voidBlack,
+      child: AmbientSpaceBackground(
+        child: Stack(
+          children: [
+            // 3D Center Interactive Planet Sphere
+            const Center(
+              child: AnimatedGlobeContainer(),
+            ),
 
-        return CupertinoPageScaffold(
-          backgroundColor: CupertinoColors.black,
-          navigationBar: CupertinoNavigationBar(
-            backgroundColor: const Color(0xCC000000),
-            middle: Text(
-              body?.name ?? 'Cosmic Globe',
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 17,
+            // Top Header Bar
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: TelemetryHud(
+                onOpenInfo: () => _openPlanetDetails(true),
               ),
             ),
-            leading: isMobile
-                ? CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () => _showCupertinoSheet(
-                      title: 'Controls & Waypoints',
-                      child: const ControlPanel(),
+
+            // Bottom Area: Planet Strip + Quick Controls
+            if (isMobile)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CelestialCarousel(),
+                    const SizedBox(height: 4),
+                    CameraControlDock(
+                      onOpenPlanetDetails: () => _openPlanetDetails(true),
                     ),
-                    child: const Icon(
-                      CupertinoIcons.slider_horizontal_3,
-                      color: CupertinoColors.activeBlue,
-                    ),
-                  )
-                : null,
-            trailing: isMobile
-                ? CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () => _showCupertinoSheet(
-                      title: 'Solar System',
-                      child: const TextureSelector(),
-                    ),
-                    child: const Icon(
-                      CupertinoIcons.circle_grid_hex,
-                      color: CupertinoColors.activeBlue,
-                    ),
-                  )
-                : null,
-          ),
-          child: SafeArea(
-            child: isMobile
-                ? Stack(
-                    children: [
-                      const Center(
-                        child: AnimatedGlobeContainer(),
+                  ],
+                ),
+              )
+            else
+              // Desktop / Tablet Layout
+              Positioned.fill(
+                top: 80,
+                child: Row(
+                  children: [
+                    // Left Rail: Study Sheet
+                    Container(
+                      width: 380,
+                      margin: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xF010172D),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: const Color(0x33FFFFFF)),
                       ),
-                      // Floating Apple Cupertino Quick Dock
-                      Positioned(
-                        bottom: 16,
-                        left: 24,
-                        right: 24,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: const Color(0xE61C1C1E),
-                            borderRadius: BorderRadius.circular(28),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.4),
-                                blurRadius: 16,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      child: const ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(24)),
+                        child: PlanetDetailSheet(),
+                      ),
+                    ),
+
+                    // Center & Bottom Carousel
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 24),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              CupertinoButton(
-                                padding: EdgeInsets.zero,
-                                onPressed: () => _showCupertinoSheet(
-                                  title: 'Controls & Waypoints',
-                                  child: const ControlPanel(),
-                                ),
-                                child: const Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(CupertinoIcons.slider_horizontal_3,
-                                        color: CupertinoColors.activeBlue, size: 22),
-                                    SizedBox(height: 2),
-                                    Text('Controls',
-                                        style: TextStyle(
-                                            fontSize: 10, color: CupertinoColors.secondaryLabel)),
-                                  ],
-                                ),
-                              ),
-                              CupertinoButton(
-                                padding: EdgeInsets.zero,
-                                onPressed: () {
-                                  HapticFeedback.selectionClick();
-                                  provider.toggleRotation();
-                                },
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      provider.isRotating
-                                          ? CupertinoIcons.pause_circle_fill
-                                          : CupertinoIcons.play_circle_fill,
-                                      color: provider.isRotating
-                                          ? CupertinoColors.systemGreen
-                                          : CupertinoColors.systemGrey,
-                                      size: 24,
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      provider.isRotating ? 'Spinning' : 'Paused',
-                                      style: const TextStyle(
-                                          fontSize: 10, color: CupertinoColors.secondaryLabel),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              CupertinoButton(
-                                padding: EdgeInsets.zero,
-                                onPressed: () {
-                                  HapticFeedback.selectionClick();
-                                  provider.resetRotation();
-                                },
-                                child: const Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(CupertinoIcons.arrow_counterclockwise,
-                                        color: CupertinoColors.systemOrange, size: 22),
-                                    SizedBox(height: 2),
-                                    Text('Reset',
-                                        style: TextStyle(
-                                            fontSize: 10, color: CupertinoColors.secondaryLabel)),
-                                  ],
-                                ),
-                              ),
-                              CupertinoButton(
-                                padding: EdgeInsets.zero,
-                                onPressed: () => _showCupertinoSheet(
-                                  title: 'Solar System',
-                                  child: const TextureSelector(),
-                                ),
-                                child: const Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(CupertinoIcons.globe,
-                                        color: CupertinoColors.systemPurple, size: 22),
-                                    SizedBox(height: 2),
-                                    Text('Planets',
-                                        style: TextStyle(
-                                            fontSize: 10, color: CupertinoColors.secondaryLabel)),
-                                  ],
-                                ),
+                              const CelestialCarousel(),
+                              const SizedBox(height: 10),
+                              CameraControlDock(
+                                onOpenPlanetDetails: () => _openPlanetDetails(true),
                               ),
                             ],
                           ),
                         ),
                       ),
-                    ],
-                  )
-                : const Row(
-                    children: [
-                      SizedBox(width: 320, child: ControlPanel()),
-                      Expanded(
-                        child: Center(child: AnimatedGlobeContainer()),
-                      ),
-                      SizedBox(width: 320, child: TextureSelector()),
-                    ],
-                  ),
-          ),
-        );
-      },
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -302,63 +239,89 @@ class _HomeScreenState extends State<HomeScreen> {
   // Android Material 3 Screen
   // -------------------------------------------------------------------------
   Widget _buildMaterialHomeScreen(bool isMobile) {
-    return Consumer<GlobeProvider>(
-      builder: (context, provider, _) {
-        final body = provider.selectedBody;
-
-        return Scaffold(
-          key: _scaffoldKey,
-          backgroundColor: AppColors.voidBlack,
-          drawer: isMobile ? _buildMaterialDrawer(isLeft: true) : null,
-          endDrawer: isMobile ? _buildMaterialDrawer(isLeft: false) : null,
-          appBar: AppBar(
-            backgroundColor: AppColors.primaryDark,
-            elevation: 0,
-            title: Text(
-              body?.name ?? 'Cosmic Globe',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+    return Scaffold(
+      backgroundColor: AppColors.voidBlack,
+      body: AmbientSpaceBackground(
+        child: Stack(
+          children: [
+            // 3D Center Interactive Planet Sphere
+            const Center(
+              child: AnimatedGlobeContainer(),
             ),
-            leading: isMobile
-                ? IconButton(
-                    icon: const Icon(Icons.tune),
-                    color: AppColors.neonCyan,
-                    onPressed: () => _showMaterialBottomSheet(
-                      title: 'Controls & Waypoints',
-                      child: const ControlPanel(),
+
+            // Top Header Bar
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: TelemetryHud(
+                onOpenInfo: () => _openPlanetDetails(false),
+              ),
+            ),
+
+            // Bottom Area: Planet Strip + Quick Controls
+            if (isMobile)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CelestialCarousel(),
+                    const SizedBox(height: 4),
+                    CameraControlDock(
+                      onOpenPlanetDetails: () => _openPlanetDetails(false),
                     ),
-                  )
-                : null,
-            actions: isMobile
-                ? [
-                    IconButton(
-                      icon: const Icon(Icons.public),
-                      color: AppColors.neonPurple,
-                      onPressed: () => _showMaterialBottomSheet(
-                        title: 'Solar System',
-                        child: const TextureSelector(),
+                  ],
+                ),
+              )
+            else
+              // Desktop / Tablet Layout
+              Positioned.fill(
+                top: 80,
+                child: Row(
+                  children: [
+                    // Left Rail: Study Sheet
+                    Container(
+                      width: 380,
+                      margin: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xF010172D),
+                        borderRadius: BorderRadius.circular(28),
+                        border: Border.all(color: AppColors.glassBorder),
+                      ),
+                      child: const ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(28)),
+                        child: PlanetDetailSheet(),
                       ),
                     ),
-                  ]
-                : null,
-          ),
-          body: Row(
-            children: [
-              if (!isMobile) const SizedBox(width: 320, child: ControlPanel()),
-              const Expanded(
-                child: Center(child: AnimatedGlobeContainer()),
-              ),
-              if (!isMobile) const SizedBox(width: 320, child: TextureSelector()),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
-  Widget _buildMaterialDrawer({required bool isLeft}) {
-    return Drawer(
-      backgroundColor: AppColors.primaryDark,
-      child: isLeft ? const ControlPanel() : const TextureSelector(),
+                    // Center & Bottom Carousel
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 24),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const CelestialCarousel(),
+                              const SizedBox(height: 10),
+                              CameraControlDock(
+                                onOpenPlanetDetails: () => _openPlanetDetails(false),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
