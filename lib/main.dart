@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => GlobeProvider(),
-      child: MaterialApp(
+      child:const MaterialApp(
         title: 'Cosmic Globe',
         debugShowCheckedModeBanner: false,
         home: const HomeScreen(),
